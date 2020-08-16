@@ -22,6 +22,6 @@ namespace Magnet_Component {
                 GH_Skin.palette_hidden_standard = style;
             }
         }
-        a = GH_FontServer.
+        //a = GH_FontServer.
     }
 }
