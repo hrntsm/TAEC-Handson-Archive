@@ -6,8 +6,6 @@ Materials for the hands-on at [Tokyo AEC Industry Dev Group](https://www.meetup.
 
 Slide is [here](https://docs.google.com/presentation/d/1Hu4GlZW118BceReSumMHjtgRWf-7Eru_bdiKLrkEnJg/edit?usp=sharing)
 
-Topic: grasshopper structure analysis introduction
-
 This is an online workshop held by hiron.
 
 hiron Profile: [See my twitter](https://twitter.com/hiron_rgkr)
