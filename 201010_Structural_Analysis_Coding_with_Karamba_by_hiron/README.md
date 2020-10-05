@@ -1,6 +1,5 @@
 # Structural Analysis Coding with Karamba
 
-
 ## はじめに
 
 Tokyo AEC Industry Dev Groupで2020/10/10に行われるハンズオンの資料です。Tokyo AEC Industry Dev Groupについての詳細は以下
@@ -23,7 +22,9 @@ https://www.meetup.com/ja-JP/Tokyo-AEC-Industry-Dev-Group/events/xfrxvrybcnbnb/)
 + Karambaの Scripting Guide Examples
   + https://www.karamba3d.com/download/karamba3d-1-3-2-scripting-guide-examples/?wpdmdl=7759&masterkey=5d4a003883d21
 
-## Grasshopperでコンポーネントを使ってモデルづくり
+## 柱の解析
+
+### Grasshopperでコンポーネントを使ってモデルづくり
 
 最初からKarambaを使ったコーディングをするとわかりづらいので、はじめにコンポーネントを使ってモデリングしていきます。
 作るものの条件は以下です。
@@ -35,9 +36,10 @@ https://www.meetup.com/ja-JP/Tokyo-AEC-Industry-Dev-Group/events/xfrxvrybcnbnb/)
 + 部材のID：Column
 
 こんな形です。完成したデータはDataフォルダのcolumn_model.ghです。
+
 ![GH_model](./Image/gh_model.jpg)
 
-## 同じものをC#Scriptコンポーネントで作る
+### 同じものをC#Scriptコンポーネントで作る
 
 スクリプトでKarambaを使うためには、KarambaCommon.dllとKaramba.ghaを使います。これはKarambaがインストールされたフォルダ内にあります。Karambaはデフォルトだと以下にあると思います。以下のフォルダにはKarambaCommon.dllとは別にKaramba.dllがありますが、こちらはC++で書かれたKarambaの構造計算を実際に行っている部分になります。
 
@@ -48,7 +50,10 @@ https://www.meetup.com/ja-JP/Tokyo-AEC-Industry-Dev-Group/events/xfrxvrybcnbnb/)
 基本的にはメソッドへの入力と出力がコンポーネントの入出力ほぼ同じ構成になっています。では先程作ったモデルをKarambaSDKを使って作成していきます。
 
 最初に参照を追加します。C#Scriptコンポーネントを右クリックしてManage Assemblies... を選択して、その後Referenced Assembliesの右側のAddからKarambaCommon.dllとKaramba.ghaを追加します。
+
 ![manage_assembles](./Image/manage_assembles.jpg)
+
+C#Scriptの内容
 
 ```cs
 // usingに追加
@@ -109,16 +114,24 @@ public class Script_Instance : GH_ScriptInstance
 }
 ```
 
+## 最適化を行う
+
+### あああ
+
+あああ
+
 ---
 
-## 紹介と宣伝
+## その他
+
+### 紹介と宣伝
 
 HoaryFoxのKarambaへのコンバート機能は今日の内容を使用しています。
 [![stb2karamba](https://static.food4rhino.com/s3fs-public/users-files/hironrgkr/app/stb2karamba.jpg)](https://www.food4rhino.com/app/hoaryfox)
 
 ST-Bridgeデータに限らずIFCや各BIMソフトはこういった部材の断面情報や材料情報を持っているので、今日の技術が使えれば構造解析モデルの自動作成ができるようになります。（BIMの入力の仕方によってうまくいかない点も多いですが…）
 
-## コンタクト
+### コンタクト
 
 [![Twitter](https://img.shields.io/twitter/follow/hiron_rgkr?style=social)](https://twitter.com/hiron_rgkr)
 + HP : [https://hrntsm.github.io/](https://hrntsm.github.io/)
