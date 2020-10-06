@@ -53,10 +53,11 @@ https://www.meetup.com/ja-JP/Tokyo-AEC-Industry-Dev-Group/events/xfrxvrybcnbnb/)
 
 ![manage_assembles](./Image/manage_assembles.jpg)
 
-C#Scriptの内容
+#### C#Scriptの内容
 
 ```cs
 // usingに追加
+using System.Drawing;
 using Karamba.Utilities;
 using Karamba.Geometry;
 using Karamba.CrossSections;
@@ -76,10 +77,23 @@ public class Script_Instance : GH_ScriptInstance
         var p1 = new Point3(0, 0, 5);
         var L0 = new Line3(p0, p1);
 
+        // 材料の作成
+        var E = 210000000;  // kN/m2
+        var G = 80760000;  // kN/m2
+        var gamma = 78.5;  // kN/m3
+        var material = new FemMaterial_Isotrop("Steel", "SN400", E, G, G, gamma, 0, 0, Color.Brown);
+
+        // 断面の作成
+        double height = 30;  // cm
+        double width = 30;
+        double thickness = 2.2;
+        double fillet = 2.5 * thickness;
+        var croSec = new CroSec_Box("Box", "Box", null, null, material, height, width, width, thickness, thickness, thickness, fillet);
+
         // Beamを作成
         // 入力は、Line、Id、CrossSection
         var nodes = new List<Point3>();
-        var elems = k3d.Part.LineToBeam(new List<Line3>(){ L0 }, new List<string>(){ "Column" }, new List<CroSec>(), logger, out nodes);
+        var elems = k3d.Part.LineToBeam(new List<Line3>(){ L0 }, new List<string>(){ "Column" }, new List<CroSec>( croSec ), logger, out nodes);
 
         // 境界条件の作成
         // 入力は、条件を指定するPoint3と各変位の拘束のBoolean
@@ -91,8 +105,8 @@ public class Script_Instance : GH_ScriptInstance
         var pload = k3d.Load.PointLoad(p1, new Vector3(0, 0, -10), new Vector3(), 0);
         var ploads = new List<Load>(){pload};
 
-        double mass;
-        Point3 cog;
+        double mass;  // 重量
+        Point3 cog;  // 重心
         bool flag;
         string info;
         var model = k3d.Model.AssembleModel(elems, supports, ploads, out info, out mass, out cog, out info, out flag);
