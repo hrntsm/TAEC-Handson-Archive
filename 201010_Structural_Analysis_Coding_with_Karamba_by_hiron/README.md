@@ -8,14 +8,14 @@ Tokyo AEC Industry Dev Group で 2020/10/10 に行われるハンズオンの資
 
 本ハンズオンの配信は以下です。これ以降の資料と合わせて参照してください。
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/1cT70iLK6ZY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[![](https://img.youtube.com/vi/1cT70iLK6ZY/0.jpg)](https://www.youtube.com/watch?v=1cT70iLK6ZY)
 
 ## 準備編
 
 このワークショップでは 20/08/22 に行った Grasshopper を使ったの構造解析入門の続編です。
 前回の内容はこちらです。
 
-[![200822_Grasshopper Structure Analysis Introduction](./Image/tube_thumbnail.png)](https://youtu.be/iYi5Y48zB2I)
+[![](https://img.youtube.com/vi/iYi5Y48zB2I/0.jpg)](https://www.youtube.com/watch?v=iYi5Y48zB2I)
 
 今回は Karamba を使った解析をコンポーネントで行うだけでなく、C#Script から Karamba を使用し、解析を効率化させる方法の紹介します。
 
