@@ -6,6 +6,10 @@ Tokyo AEC Industry Dev Group で 2020/10/10 に行われるハンズオンの資
 
 [Tokyo AEC Industry Dev Group Meetup Site](https://www.meetup.com/ja-JP/Tokyo-AEC-Industry-Dev-Group/events/xfrxvrybcnbnb/)
 
+本ハンズオンの配信は以下です。これ以降の資料と合わせて参照してください。
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/1cT70iLK6ZY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 ## 準備編
 
 このワークショップでは 20/08/22 に行った Grasshopper を使ったの構造解析入門の続編です。
