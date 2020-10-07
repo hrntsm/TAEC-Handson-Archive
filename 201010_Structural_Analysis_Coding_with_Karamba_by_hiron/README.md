@@ -2,58 +2,59 @@
 
 ## はじめに
 
-Tokyo AEC Industry Dev Groupで2020/10/10に行われるハンズオンの資料です。Tokyo AEC Industry Dev Groupについての詳細は以下
+Tokyo AEC Industry Dev Group で 2020/10/10 に行われるハンズオンの資料です。Tokyo AEC Industry Dev Group についての詳細は以下を参照してください。
 
-[Tokyo AEC Industry Dev Group Meetup Site](
-https://www.meetup.com/ja-JP/Tokyo-AEC-Industry-Dev-Group/events/xfrxvrybcnbnb/)
+[Tokyo AEC Industry Dev Group Meetup Site](https://www.meetup.com/ja-JP/Tokyo-AEC-Industry-Dev-Group/events/xfrxvrybcnbnb/)
 
 ## 準備編
 
-このワークショップでは20/08/22に行ったGrasshopperを使ったの構造解析入門の続編です。
+このワークショップでは 20/08/22 に行った Grasshopper を使ったの構造解析入門の続編です。
 前回の内容はこちらです。
 
 [![200822_Grasshopper Structure Analysis Introduction](./Image/tube_thumbnail.png)](https://youtu.be/iYi5Y48zB2I)
 
-今回は、Karambaを使った解析をコンポーネントで行うだけでなく、C#ScriptからKarambaを使用し、解析を効率化させる方法の紹介を行います。
+今回は Karamba を使った解析をコンポーネントで行うだけでなく、C#Script から Karamba を使用し、解析を効率化させる方法の紹介します。
 
 ワークショップの前に、以下のものを準備しておいてください。
-+ Karambaのインストール(Trial版ではなくFree版)
-  + https://www.food4rhino.com/app/karamba3d
-+ Karambaの Scripting Guide Examples
-  + https://www.karamba3d.com/download/karamba3d-1-3-2-scripting-guide-examples/?wpdmdl=7759&masterkey=5d4a003883d21
+
+- Karamba のインストール(Trial 版ではなく Free 版)
+  - https://www.food4rhino.com/app/karamba3d
+- Karamba の Scripting Guide Examples
+  - https://www.karamba3d.com/download/karamba3d-1-3-2-scripting-guide-examples/?wpdmdl=7759&masterkey=5d4a003883d21
 
 ## 柱の解析
 
-### Grasshopperでコンポーネントを使ってモデルづくり
+### Grasshopper でコンポーネントを使ってモデルづくり
 
-最初からKarambaを使ったコーディングをするとわかりづらいので、はじめにコンポーネントを使ってモデリングしていきます。
+最初から Karamba を使ったコーディングをするとわかりづらいので、はじめにコンポーネントを使ってモデリングしていきます。
 作るものの条件は以下です。
-+ 断面形状：角型 30cm x 30cm  板厚 2.2cm
-+ 材料：鋼材、色を赤にする
-+ 境界条件：下端固定
-+ 荷重：上端に－Z方向に10kN
-+ 部材長：3m
-+ 部材のID：Column
 
-こんな形です。完成したデータはDataフォルダのcolumn_model.ghです。
+- 断面形状：角型 30cmx30cm 板厚 2.2cm
+- 材料：鋼材、色を赤にする
+- 境界条件：下端固定
+- 荷重：上端節点に対して、－Z 方向に 10kN
+- 部材長：3m
+- 部材の ID：Column
+
+こんな形です。完成したデータは Data フォルダの column_model.gh です。
 
 ![GH_model](./Image/gh_model.jpg)
 
-### 同じものをC#Scriptコンポーネントで作る
+### 同じものを C#Script コンポーネントで作る
 
-スクリプトでKarambaを使うためには、KarambaCommon.dllとKaramba.ghaを使います。これはKarambaがインストールされたフォルダ内にあります。Karambaはデフォルトだと以下にあると思います。以下のフォルダにはKarambaCommon.dllとは別にKaramba.dllがありますが、こちらはC++で書かれたKarambaの構造計算を実際に行っている部分になります。
+スクリプトで Karamba を使うためには、KarambaCommon.dll と Karamba.gha を使います。これは Karamba がインストールされたフォルダ内にあります。Karamba はデフォルトだと以下にあります。以下のフォルダには KarambaCommon.dll とは別に Karamba.dll がありますが、こちらは C++で書かれた Karamba の構造計算を実際に行っている部分になります。
 
 > C:\Program Files\Rhino6\Plug-ins\Karamba\karambaCommon.dll
 
-これだけだとどんなクラスがあるかわからないので、準備編でダウンロードしたKarambaのScripting Guide Examplesを使います。この中に Karamba3D_1.3.2_Documentation.chm があるのでそれを開くとKarambaのSDKを確認することができます。
+これだけだとどんなクラスがあるかわからないので、準備編でダウンロードした Karamba の Scripting Guide Examples を使います。この中に Karamba3D_1.3.2_Documentation.chm があるのでそれを開くと Karamba の SDK を確認できます。
 
-基本的にはメソッドへの入力と出力がコンポーネントの入出力ほぼ同じ構成になっています。では先程作ったモデルをKarambaSDKを使って作成していきます。
+基本的にはメソッドへの入力と出力がコンポーネントの入出力ほぼ同じ構成になっています。では先程作ったモデルを KarambaSDK を使って作成していきます。
 
-最初に参照を追加します。C#Scriptコンポーネントを右クリックしてManage Assemblies... を選択して、その後Referenced Assembliesの右側のAddからKarambaCommon.dllとKaramba.ghaを追加します。
+最初に参照を追加します。C#Script コンポーネントを右クリックして Manage Assemblies... を選択して、その後 Referenced Assemblies の右側の Add から KarambaCommon.dll と Karamba.gha を追加します。
 
 ![manage_assembles](./Image/manage_assembles.jpg)
 
-#### C#Scriptの内容
+#### C#Script の内容
 
 ```cs
 // usingに追加
@@ -140,15 +141,17 @@ public class Script_Instance : GH_ScriptInstance
 
 ### 紹介と宣伝
 
-HoaryFoxのKarambaへのコンバート機能は今日の内容を使用しています。
+HoaryFox の Karamba へのコンバート機能は今日の内容を使用しています。
 [![stb2karamba](https://static.food4rhino.com/s3fs-public/users-files/hironrgkr/app/stb2karamba.jpg)](https://www.food4rhino.com/app/hoaryfox)
 
-ST-Bridgeデータに限らずIFCや各BIMソフトはこういった部材の断面情報や材料情報を持っているので、今日の技術が使えれば構造解析モデルの自動作成ができるようになります。（BIMの入力の仕方によってうまくいかない点も多いですが…）
+ST-Bridge データに限らず IFC や各 BIM ソフトはこういった部材の断面情報や材料情報を持っているので、今日の技術が使えれば構造解析モデルの自動作成ができるようになります。
+（BIM の入力の仕方によってうまくいかない点も多いですが…）
 
 ### コンタクト
 
 [![Twitter](https://img.shields.io/twitter/follow/hiron_rgkr?style=social)](https://twitter.com/hiron_rgkr)
-+ HP : [https://hrntsm.github.io/](https://hrntsm.github.io/)
-+ Blog : [https://rgkr-memo.blogspot.com/](https://rgkr-memo.blogspot.com/)
-+ Mail : support(at)hrntsm.com
-  + change (at) to @
+
+- HP : [https://hrntsm.github.io/](https://hrntsm.github.io/)
+- Blog : [https://rgkr-memo.blogspot.com/](https://rgkr-memo.blogspot.com/)
+- Mail : support(at)hrntsm.com
+  - change (at) to @
