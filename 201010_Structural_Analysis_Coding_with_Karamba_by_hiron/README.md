@@ -12,12 +12,12 @@ Tokyo AEC Industry Dev Group で 2020/10/10 に行われるハンズオンの資
 
 ## 準備編
 
-このワークショップでは 20/08/22 に行った Grasshopper を使ったの構造解析入門の続編です。
+このワークショップは 20/08/22 に行った Grasshopper を使ったの構造解析入門の続編です。
 前回の内容はこちらです。
 
 [![](https://img.youtube.com/vi/iYi5Y48zB2I/0.jpg)](https://www.youtube.com/watch?v=iYi5Y48zB2I)
 
-今回は Karamba を使った解析をコンポーネントで行うだけでなく、C#Script から Karamba を使用し、解析を効率化させる方法の紹介します。
+今回は Karamba を使った解析をコンポーネントで行うだけでなく、C#Script から Karamba を使用し、解析を効率化させる方法の紹介します。この内容は以下の Scripting Guide Examples の内容を抜粋し今回向けに変更したものとなっています。
 
 ワークショップの前に、以下のものを準備しておいてください。
 
@@ -60,8 +60,9 @@ Tokyo AEC Industry Dev Group で 2020/10/10 に行われるハンズオンの資
 
 #### C#Script の内容
 
+完成したデータは Data フォルダの column_script.gh です。
+
 ```cs
-// usingに追加
 using System.Drawing;
 using Karamba.Utilities;
 using Karamba.Geometry;
@@ -133,11 +134,91 @@ public class Script_Instance : GH_ScriptInstance
 }
 ```
 
-## 最適化を行う
+## 構造解析で形状をいじる
 
-### あああ
+### 片持ち梁の変更
 
-あああ
+片持ち梁を作成し、その応力が許容応力以内におさまる最小の断面にするものを作成します。
+
+断面は Karamba の CrossSectionRangeSelector コンポーネントを使用します。このコンポーネントが出力する断面のリストから先程の条件を満たす断面サイズを決定するようにプログラムを作成します。Karamba のデフォルトの断面リストには日本の規格も含んでおり、JIS 規格がベースになっています。例えばメーカー品の断面を使用する場合は自分で追加できます。参考として SH と BCP を追加したものが Data/JP_CrossSectionValues.csv のデータになります。Read CrossSection Table From File コンポーネントでこれを読み込むことができます。
+
+
+#### C#Script の内容
+```cs
+using Karamba.Models;
+using Karamba.CrossSections;
+using Karamba.Elements;
+using Karamba.Results;
+
+
+public class Script_Instance : GH_ScriptInstance
+{
+    private void RunScript(ref object ModelOut, ref object MaxDisp)
+    {
+      var model = Model_in as Model;
+      if (model == null) {
+        throw new ArgumentException("The input in 'Model_in' is not of type Karamba.Models.Model!");
+      }
+
+      var crosecs = new List<CroSec_Beam>(CroSecs_in.Count);
+      foreach (var item in CroSecs_in) {
+        var crosec = item as CroSec_Beam;
+        if (crosec == null) {
+          throw new ArgumentException("The input in 'CroSecs_in' contains objects which are not of type Karamba.CrossSections.CroSec_Beam!");
+        }
+        crosecs.Add(crosec);
+      }
+
+      var k3d = new KarambaCommon.Toolkit();
+      List<double> max_disp;
+      List<double> out_g;
+      List<double> out_comp;
+      string message;
+      List<List<double>> N;
+      List<List<double>> V;
+      List<List<double>> M;
+
+      // avoid side effects
+      model = model.Clone();
+      model.cloneElements();
+
+      for (int i = 0; i < niter; ++i) {
+        model = k3d.Algorithms.AnalyzeThI(model, out max_disp, out out_g, out out_comp, out message);
+
+        for (int elem_ind = 0; elem_ind < model.elems.Count; ++elem_ind) {
+          var beam = model.elems[elem_ind] as ModelBeam;
+          if (beam == null) continue;
+
+          // avoid side effects
+          beam = (ModelBeam) beam.Clone();
+          model.elems[elem_ind] = beam;
+
+          BeamResultantForces.solve(model, new List<string> {"" + elem_ind}, lcind, 100, 1,
+            out N, out V, out M);
+
+          for (int crosec_ind = 0; crosec_ind < crosecs.Count; ++crosec_ind) {
+            var crosec = crosecs[crosec_ind];
+            beam.crosec = crosec;
+            var max_sigma = Math.Abs(N[lcind][0]) / crosec.A + M[lcind][0] / crosec.Wely_z_pos;
+            if (max_sigma < crosec.material.fy()) break;
+          }
+        }
+
+        model.initMaterialCroSecLists();
+        model.febmodel = model.buildFEModel();
+      }
+
+      model = k3d.Algorithms.AnalyzeThI(model, out max_disp, out out_g, out out_comp, out message);
+
+      Disp_out = new GH_Number(max_disp[lcind]);
+      Model_out = new Karamba.GHopper.Models.GH_Model(model);
+    }
+}
+```
+
+## NextStep
+
+Scripting Guide Examples の CrossSectionOptimization.gh と ModelCreation.gh をベースにしたものです。他にもたくさんの参考例が含まれていますので、興味がある方は中身を確認してください。
 
 ---
 
