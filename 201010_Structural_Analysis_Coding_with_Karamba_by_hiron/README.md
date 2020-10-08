@@ -142,9 +142,12 @@ public class Script_Instance : GH_ScriptInstance
 
 断面は Karamba の CrossSectionRangeSelector コンポーネントを使用します。このコンポーネントが出力する断面のリストから先程の条件を満たす断面サイズを決定するようにプログラムを作成します。Karamba のデフォルトの断面リストには日本の規格も含んでおり、JIS 規格がベースになっています。例えばメーカー品の断面を使用する場合は自分で追加できます。参考として SH と BCP を追加したものが Data/JP_CrossSectionValues.csv のデータになります。Read CrossSection Table From File コンポーネントでこれを読み込むことができます。
 
-
 #### C#Script の内容
+
+断面リストの取得に失敗すると Karamba のデフォルトの断面である RO114.3/4 になるので、そうなっている場合は確認してください。
+
 ```cs
+using System.Linq;
 using Karamba.Models;
 using Karamba.CrossSections;
 using Karamba.Elements;
@@ -153,26 +156,17 @@ using Karamba.Results;
 
 public class Script_Instance : GH_ScriptInstance
 {
-    private void RunScript(ref object ModelOut, ref object MaxDisp)
+    private void RunScript(object modelIn, List<object> croSecsIn, int nIter, int lcInd, ref object modelOut, ref object dispOut)
     {
-      var model = Model_in as Model;
-      if (model == null) {
-        throw new ArgumentException("The input in 'Model_in' is not of type Karamba.Models.Model!");
-      }
+      var model = modelIn as Model;
 
-      var crosecs = new List<CroSec_Beam>(CroSecs_in.Count);
-      foreach (var item in CroSecs_in) {
-        var crosec = item as CroSec_Beam;
-        if (crosec == null) {
-          throw new ArgumentException("The input in 'CroSecs_in' contains objects which are not of type Karamba.CrossSections.CroSec_Beam!");
-        }
-        crosecs.Add(crosec);
-      }
+      var croSecs = new List<CroSec_Beam>(croSecsIn.Count);
+      croSecs.AddRange(croSecsIn.Select(item => item as CroSec_Beam));
 
       var k3d = new KarambaCommon.Toolkit();
-      List<double> max_disp;
-      List<double> out_g;
-      List<double> out_comp;
+      List<double> maxDisp;
+      List<double> outG;
+      List<double> outComp;
       string message;
       List<List<double>> N;
       List<List<double>> V;
@@ -182,25 +176,25 @@ public class Script_Instance : GH_ScriptInstance
       model = model.Clone();
       model.cloneElements();
 
-      for (int i = 0; i < niter; ++i) {
-        model = k3d.Algorithms.AnalyzeThI(model, out max_disp, out out_g, out out_comp, out message);
+      for (int i = 0; i < nIter; ++i) {
+        model = k3d.Algorithms.AnalyzeThI(model, out maxDisp, out outG, out outComp, out message);
 
-        for (int elem_ind = 0; elem_ind < model.elems.Count; ++elem_ind) {
-          var beam = model.elems[elem_ind] as ModelBeam;
+        for (int elemInd = 0; elemInd < model.elems.Count; ++elemInd) {
+          var beam = model.elems[elemInd] as ModelBeam;
           if (beam == null) continue;
 
           // avoid side effects
           beam = (ModelBeam) beam.Clone();
-          model.elems[elem_ind] = beam;
+          model.elems[elemInd] = beam;
 
-          BeamResultantForces.solve(model, new List<string> {"" + elem_ind}, lcind, 100, 1,
+          BeamResultantForces.solve(model, new List<string> {"" + elemInd}, lcInd, 100, 1,
             out N, out V, out M);
 
-          for (int crosec_ind = 0; crosec_ind < crosecs.Count; ++crosec_ind) {
-            var crosec = crosecs[crosec_ind];
-            beam.crosec = crosec;
-            var max_sigma = Math.Abs(N[lcind][0]) / crosec.A + M[lcind][0] / crosec.Wely_z_pos;
-            if (max_sigma < crosec.material.fy()) break;
+          foreach (var croSec in croSecs)
+          {
+            beam.crosec = croSec;
+            var maxSigma = Math.Abs(N[lcInd][0]) / croSec.A + M[lcInd][0] / croSec.Wely_z_pos;
+            if (maxSigma < croSec.material.fy()) break;
           }
         }
 
@@ -208,10 +202,10 @@ public class Script_Instance : GH_ScriptInstance
         model.febmodel = model.buildFEModel();
       }
 
-      model = k3d.Algorithms.AnalyzeThI(model, out max_disp, out out_g, out out_comp, out message);
+      model = k3d.Algorithms.AnalyzeThI(model, out maxDisp, out outG, out outComp, out message);
 
-      Disp_out = new GH_Number(max_disp[lcind]);
-      Model_out = new Karamba.GHopper.Models.GH_Model(model);
+      dispOut = new GH_Number(maxDisp[lcInd]);
+      modelOut = new Karamba.GHopper.Models.GH_Model(model);
     }
 }
 ```
