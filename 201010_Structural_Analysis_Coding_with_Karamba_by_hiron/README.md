@@ -60,7 +60,7 @@ Tokyo AEC Industry Dev Group で 2020/10/10 に行われるハンズオンの資
 
 #### C#Script の内容
 
-完成したデータは Data フォルダの column_script.gh です。
+完成したデータは Data フォルダの column_script.gh です。注意点ですが、以下のコード中でコメントアウトしているように単位がものによってまちまちなので注意してください。
 
 ```cs
 using System.Drawing;
@@ -72,7 +72,7 @@ using Karamba.Loads;
 
 public class Script_Instance : GH_ScriptInstance
 {
-    private void RunScript(ref object ModelOut, ref object MaxDisp)
+    private void RunScript(ref object modelOut, ref object maxDisp)
     {
         var logger = new MessageLogger();
         var k3d = new KarambaCommon.Toolkit();
@@ -118,18 +118,16 @@ public class Script_Instance : GH_ScriptInstance
         var model = k3d.Model.AssembleModel(elems, supports, ploads, out info, out mass, out cog, out info, out flag);
 
         // 解析を実行
-        List<double> max_disps;
-        List<double> out_g;
-        List<double> out_comp;
+        List<double> maxDisps;  // m
+        List<double> outG;
+        List<double> outComp;
         string message;
-        model = k3d.Algorithms.AnalyzeThI(model, out max_disp, out out_g, out out_comp, out message);
+        model = k3d.Algorithms.AnalyzeThI(model, out maxDisps, out outG, out outComp, out message);
 
-        var ucf = UnitsConversionFactories.Conv();
-        UnitConversion cm = ucf.cm();
-        Print("max disp: " + cm.toUnit(max_disp[0]) + cm.unitB);
+        Print("max disp: " + maxDisps.Max() * 100);
 
-        ModelOut = new Karamba.GHopper.Models.GH_Model(model);
-        MaxDisp = cm.toUnit(max_disp.Max());
+        modelOut = new Karamba.GHopper.Models.GH_Model(model);
+        maxDisp = maxDisps.Max() * 100;
     }
 }
 ```
@@ -153,13 +151,13 @@ using Karamba.CrossSections;
 using Karamba.Elements;
 using Karamba.Results;
 
-
 public class Script_Instance : GH_ScriptInstance
 {
     private void RunScript(object modelIn, List<object> croSecsIn, int nIter, int lcInd, ref object modelOut, ref object dispOut)
     {
+      // modelIn と croSecIn は object 型として入力されているので、
+      // ここで Karamba の型にキャスト
       var model = modelIn as Model;
-
       var croSecs = new List<CroSec_Beam>(croSecsIn.Count);
       croSecs.AddRange(croSecsIn.Select(item => item as CroSec_Beam));
 
@@ -172,43 +170,51 @@ public class Script_Instance : GH_ScriptInstance
       List<List<double>> V;
       List<List<double>> M;
 
-      // avoid side effects
-      model = model.Clone();
-      model.cloneElements();
-
-      for (int i = 0; i < nIter; ++i) {
+      // nIterの分だけ断面の収束計算を行う
+      for (int i = 0; i < nIter; i++)
+      {
+        // 最初に解析を実行
         model = k3d.Algorithms.AnalyzeThI(model, out maxDisp, out outG, out outComp, out message);
 
-        for (int elemInd = 0; elemInd < model.elems.Count; ++elemInd) {
+        // ここから各要素の応力を取得してそれに対して断面の検討を行う
+        for (int elemInd = 0; elemInd < model.elems.Count; elemInd++)
+        {
           var beam = model.elems[elemInd] as ModelBeam;
-          if (beam == null) continue;
+          if (beam == null)
+            continue;
 
-          // avoid side effects
-          beam = (ModelBeam) beam.Clone();
-          model.elems[elemInd] = beam;
+          // 要素の応力を取得
+          BeamResultantForces.solve(model, new List<string> {elemInd.ToString()}, lcInd, 100, 1, out N, out V, out M);
 
-          BeamResultantForces.solve(model, new List<string> {"" + elemInd}, lcInd, 100, 1,
-            out N, out V, out M);
-
+          // 断面検定
           foreach (var croSec in croSecs)
           {
             beam.crosec = croSec;
             var maxSigma = Math.Abs(N[lcInd][0]) / croSec.A + M[lcInd][0] / croSec.Wely_z_pos;
-            if (maxSigma < croSec.material.fy()) break;
+            if (maxSigma < croSec.material.fy())
+              break;  // 断面が許容応力以下になったら断面の変更を終了
           }
         }
 
+        // ここまでの処理で変更した断面を反映させて、解析モデルを再生成
         model.initMaterialCroSecLists();
         model.febmodel = model.buildFEModel();
+        // 次のステップへ
       }
 
+      // 最終モデルの確認用に最後の解析実行
       model = k3d.Algorithms.AnalyzeThI(model, out maxDisp, out outG, out outComp, out message);
 
-      dispOut = new GH_Number(maxDisp[lcInd]);
+      // 結果の出力
+      dispOut = new GH_Number(maxDisp[lcInd] * 100);
       modelOut = new Karamba.GHopper.Models.GH_Model(model);
     }
 }
 ```
+
+#### ちなみに
+
+この断面最適化は Karamba の有料版だとコンポーネントとしてはじめから使用できます。コンポーネントに対しては制限がありますが、SDK を使う場合はクラスやメソッドに対して制限がかかっているわけではないようです。
 
 ## NextStep
 
