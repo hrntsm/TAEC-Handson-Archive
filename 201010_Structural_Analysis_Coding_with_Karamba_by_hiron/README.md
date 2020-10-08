@@ -1,5 +1,8 @@
 # Structural Analysis Coding with Karamba
 
+[![](https://img.shields.io/website?color=red&down_color=red&logoColor=red&up_color=red&up_message=Tokyo%20AEC%20Industry%20Dev%20Group&url=https%3A%2F%2Fwww.meetup.com%2Fja-JP%2FTokyo-AEC-Industry-Dev-Group%2F)](https://www.meetup.com/ja-JP/Tokyo-AEC-Industry-Dev-Group/)
+![](https://img.shields.io/github/license/hrntsm/TAEC-Handson-Archive)
+
 ## 目次
 
 - [はじめに](https://github.com/hrntsm/TAEC-Handson-Archive/tree/master/201010_Structural_Analysis_Coding_with_Karamba_by_hiron#はじめに)
