@@ -13,7 +13,7 @@
   - [C#Script の内容](https://github.com/hrntsm/TAEC-Handson-Archive/tree/master/201010_Structural_Analysis_Coding_with_Karamba_by_hiron#cscript-%E3%81%AE%E5%86%85%E5%AE%B9)
 - [構造解析で形状をいじる](https://github.com/hrntsm/TAEC-Handson-Archive/tree/master/201010_Structural_Analysis_Coding_with_Karamba_by_hiron#%E6%A7%8B%E9%80%A0%E8%A7%A3%E6%9E%90%E3%81%A7%E5%BD%A2%E7%8A%B6%E3%82%92%E3%81%84%E3%81%98%E3%82%8B)
   - [片持ち梁の変更](https://github.com/hrntsm/TAEC-Handson-Archive/tree/master/201010_Structural_Analysis_Coding_with_Karamba_by_hiron#%E7%89%87%E6%8C%81%E3%81%A1%E6%A2%81%E3%81%AE%E5%A4%89%E6%9B%B4)
-  - [C#Script の内容](https://github.com/hrntsm/TAEC-Handson-Archive/tree/master/201010_Structural_Analysis_Coding_with_Karamba_by_hiron#cscript-%E3%81%AE%E5%86%85%E5%AE%B9-1) 
+  - [C#Script の内容](https://github.com/hrntsm/TAEC-Handson-Archive/tree/master/201010_Structural_Analysis_Coding_with_Karamba_by_hiron#cscript-%E3%81%AE%E5%86%85%E5%AE%B9-1)
   - [ちなみに](https://github.com/hrntsm/TAEC-Handson-Archive/tree/master/201010_Structural_Analysis_Coding_with_Karamba_by_hiron#%E3%81%A1%E3%81%AA%E3%81%BF%E3%81%AB)
 - [NextStep](https://github.com/hrntsm/TAEC-Handson-Archive/tree/master/201010_Structural_Analysis_Coding_with_Karamba_by_hiron#nextstep)
 - [その他](https://github.com/hrntsm/TAEC-Handson-Archive/tree/master/201010_Structural_Analysis_Coding_with_Karamba_by_hiron#%E3%81%9D%E3%81%AE%E4%BB%96)
@@ -156,13 +156,24 @@ public class Script_Instance : GH_ScriptInstance
 
 ### 片持ち梁の変更
 
-片持ち梁を作成し、その応力が許容応力以内におさまる最小の断面にするものを作成します。
+片持ち梁を作成し、その応力が許容応力以内におさまる最小の断面にするものを作成します。断面は作成した断面リストの中から選択します。
+
+![canti_opt](./Image/canti_opt.jpg)
+
+### 断面リストの作成
 
 断面は Karamba の CrossSectionRangeSelector コンポーネントを使用します。このコンポーネントが出力する断面のリストから先程の条件を満たす断面サイズを決定するようにプログラムを作成します。Karamba のデフォルトの断面リストには日本の規格も含んでおり、JIS 規格がベースになっています。例えばメーカー品の断面を使用する場合は自分で追加できます。参考として SH と BCP を追加したものが Data/JP_CrossSectionValues.csv のデータになります。Read CrossSection Table From File コンポーネントでこれを読み込むことができます。
 
+断面リストのフォーマットは以下のようになっています。
+
+|ラベル|country|family|name|shape|h|t_web|b_upper|t_upper|b_lower|t_lower|r|ex|ey|ez|zs|A|Ay|Az|Iy|Wy|Wply|i_y|Iz|Wz|Wplz|i_z|It|Wt|Cw|alpha_y|alpha_z|alpha_LT|Product|
+|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
+|単位|-|-|-|-|mm|mm|mm|mm|mm|mm|mm|cm|cm|cm|cm|cm2|cm2|cm2|cm4|cm3|cm3|cm|cm4|cm3|cm3|cm|cm4|cm3|cm6|-|-|-|-|
+|例|Japan|H|H 100 x 100 x 6 x 8|I|100|6|100|8|||8||||5|21.59|16.55|5.04|378|75.6||86.4|4.18|134|26.7|41|2.49|4.91|6.14|2820|0.34|0.49|0.34|3|
+
 #### C#Script の内容
 
-断面リストの取得に失敗すると Karamba のデフォルトの断面である RO114.3/4 になるので、そうなっている場合は確認してください。
+断面リストの取得に失敗すると Karamba のデフォルトの断面である RO114.3/4 になるので、出力がおかしいと思った場合は確認してください。
 
 ```cs
 using System.Linq;
