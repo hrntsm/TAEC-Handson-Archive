@@ -13,6 +13,7 @@
   - [C#Script の内容](https://github.com/hrntsm/TAEC-Handson-Archive/tree/master/201010_Structural_Analysis_Coding_with_Karamba_by_hiron#cscript-%E3%81%AE%E5%86%85%E5%AE%B9)
 - [構造解析で形状をいじる](https://github.com/hrntsm/TAEC-Handson-Archive/tree/master/201010_Structural_Analysis_Coding_with_Karamba_by_hiron#%E6%A7%8B%E9%80%A0%E8%A7%A3%E6%9E%90%E3%81%A7%E5%BD%A2%E7%8A%B6%E3%82%92%E3%81%84%E3%81%98%E3%82%8B)
   - [片持ち梁の変更](https://github.com/hrntsm/TAEC-Handson-Archive/tree/master/201010_Structural_Analysis_Coding_with_Karamba_by_hiron#%E7%89%87%E6%8C%81%E3%81%A1%E6%A2%81%E3%81%AE%E5%A4%89%E6%9B%B4)
+  - [断面リストの作成](https://github.com/hrntsm/TAEC-Handson-Archive/tree/master/201010_Structural_Analysis_Coding_with_Karamba_by_hiron#%E6%96%AD%E9%9D%A2%E3%83%AA%E3%82%B9%E3%83%88%E3%81%AE%E4%BD%9C%E6%88%90)
   - [C#Script の内容](https://github.com/hrntsm/TAEC-Handson-Archive/tree/master/201010_Structural_Analysis_Coding_with_Karamba_by_hiron#cscript-%E3%81%AE%E5%86%85%E5%AE%B9-1)
   - [ちなみに](https://github.com/hrntsm/TAEC-Handson-Archive/tree/master/201010_Structural_Analysis_Coding_with_Karamba_by_hiron#%E3%81%A1%E3%81%AA%E3%81%BF%E3%81%AB)
 - [NextStep](https://github.com/hrntsm/TAEC-Handson-Archive/tree/master/201010_Structural_Analysis_Coding_with_Karamba_by_hiron#nextstep)
@@ -169,7 +170,7 @@ public class Script_Instance : GH_ScriptInstance
 |ラベル|country|family|name|shape|h|t_web|b_upper|t_upper|b_lower|t_lower|r|ex|ey|ez|zs|A|Ay|Az|Iy|Wy|Wply|i_y|Iz|Wz|Wplz|i_z|It|Wt|Cw|alpha_y|alpha_z|alpha_LT|Product|
 |-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
 |単位|-|-|-|-|mm|mm|mm|mm|mm|mm|mm|cm|cm|cm|cm|cm2|cm2|cm2|cm4|cm3|cm3|cm|cm4|cm3|cm3|cm|cm4|cm3|cm6|-|-|-|-|
-|例|Japan|H|H 100 x 100 x 6 x 8|I|100|6|100|8|||8||||5|21.59|16.55|5.04|378|75.6||86.4|4.18|134|26.7|41|2.49|4.91|6.14|2820|0.34|0.49|0.34|3|
+|例|Japan|H|H 100 x 100 x 6 x 8|I|100|6|100|8|||8||||5|21.59|16.55|5.04|378|75.6|86.4|4.18|134|26.7|41|2.49|4.91|6.14|2820|0.34|0.49|0.34|3|
 
 #### C#Script の内容
 
