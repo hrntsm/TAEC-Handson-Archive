@@ -7,7 +7,6 @@
         }
     },
     "preset-ja-technical-writing": true,
-    "spellcheck-tech-word": true,
-    "no-mix-dearu-desumasu": true
+    "spellcheck-tech-word": true
   }
 }
