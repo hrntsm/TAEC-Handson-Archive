@@ -2,7 +2,7 @@ Django==3.1.1
 asgiref==3.2.10
 pytz==2020.1
 sqlparse==0.3.1
-djangorestframework==3.11.1
+djangorestframework==3.11.2
 django-cors-headers==3.5.0
 pycparser==2.20
 pythonnet==2.5.1
